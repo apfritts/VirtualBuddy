@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import OSLog
+import Virtualization
 import BuddyFoundation
 
 @MainActor
@@ -400,6 +401,9 @@ public extension VMLibraryController {
 
         newVM.bundleURL.creationDate = .now
         newVM.uuid = UUID()
+        for index in newVM.configuration.hardware.networkDevices.indices {
+            newVM.configuration.hardware.networkDevices[index].macAddress = VZMACAddress.randomLocallyAdministered().string.uppercased()
+        }
 
         try newVM.saveMetadata()
 

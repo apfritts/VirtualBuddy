@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Virtualization
 import VirtualCore
 import BuddyFoundation
 
@@ -42,18 +43,34 @@ struct NetworkConfigurationView: View {
     
     @ViewBuilder
     private var macAddressField: some View {
-        PropertyControl("MAC Address") {
-            EphemeralTextField($hardware.networkMACAddress, alignment: .leading) { addr in
-                Text(addr)
-                    .textCase(.uppercase)
-            } editableContent: { value in
-                TextField("", text: .init(get: {
-                    value.wrappedValue.uppercased()
-                }, set: { value.wrappedValue = $0.uppercased() }))
-            } validate: { value in
-                return VBNetworkDevice.validateMAC(value)
+        HStack {
+            PropertyControl("MAC Address") {
+                EphemeralTextField($hardware.networkMACAddress, alignment: .leading) { addr in
+                    Text(addr)
+                        .textCase(.uppercase)
+                } editableContent: { value in
+                    TextField("", text: .init(get: {
+                        value.wrappedValue.uppercased()
+                    }, set: { value.wrappedValue = $0.uppercased() }))
+                } validate: { value in
+                    return VBNetworkDevice.validateMAC(value)
+                }
             }
+
+            Spacer()
+
+            Button {
+                randomizeMacAddress()
+            } label: {
+                Image(systemName: "arrow.clockwise")
+            }
+            .buttonStyle(.plain)
+            .help("Generate a random MAC address")
         }
+    }
+
+    private func randomizeMacAddress() {
+        hardware.networkMACAddress = VZMACAddress.randomLocallyAdministered().string.uppercased()
     }
 }
 
